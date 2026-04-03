@@ -1,0 +1,136 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Code\\Code Web\\N3K2\\Testter\\KhachSanTest\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{8898E143-7BE8-4BB9-BAD2-F75061A472B9}|KhachSanTest\\KhachSanTest.csproj|d:\\code\\code web\\n3k2\\testter\\khachsantest\\khachsantest\\tests\\registertests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8898E143-7BE8-4BB9-BAD2-F75061A472B9}|KhachSanTest\\KhachSanTest.csproj|solutionrelative:khachsantest\\tests\\registertests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8898E143-7BE8-4BB9-BAD2-F75061A472B9}|KhachSanTest\\KhachSanTest.csproj|d:\\code\\code web\\n3k2\\testter\\khachsantest\\khachsantest\\utilities\\exceldataprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8898E143-7BE8-4BB9-BAD2-F75061A472B9}|KhachSanTest\\KhachSanTest.csproj|solutionrelative:khachsantest\\utilities\\exceldataprovider.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8898E143-7BE8-4BB9-BAD2-F75061A472B9}|KhachSanTest\\KhachSanTest.csproj|d:\\code\\code web\\n3k2\\testter\\khachsantest\\khachsantest\\tests\\logintests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8898E143-7BE8-4BB9-BAD2-F75061A472B9}|KhachSanTest\\KhachSanTest.csproj|solutionrelative:khachsantest\\tests\\logintests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8898E143-7BE8-4BB9-BAD2-F75061A472B9}|KhachSanTest\\KhachSanTest.csproj|d:\\code\\code web\\n3k2\\testter\\khachsantest\\khachsantest\\pages\\registerpage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8898E143-7BE8-4BB9-BAD2-F75061A472B9}|KhachSanTest\\KhachSanTest.csproj|solutionrelative:khachsantest\\pages\\registerpage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8898E143-7BE8-4BB9-BAD2-F75061A472B9}|KhachSanTest\\KhachSanTest.csproj|d:\\code\\code web\\n3k2\\testter\\khachsantest\\khachsantest\\utilities\\screenshothelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8898E143-7BE8-4BB9-BAD2-F75061A472B9}|KhachSanTest\\KhachSanTest.csproj|solutionrelative:khachsantest\\utilities\\screenshothelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8898E143-7BE8-4BB9-BAD2-F75061A472B9}|KhachSanTest\\KhachSanTest.csproj|d:\\code\\code web\\n3k2\\testter\\khachsantest\\khachsantest\\tests\\testreadexcel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8898E143-7BE8-4BB9-BAD2-F75061A472B9}|KhachSanTest\\KhachSanTest.csproj|solutionrelative:khachsantest\\tests\\testreadexcel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8898E143-7BE8-4BB9-BAD2-F75061A472B9}|KhachSanTest\\KhachSanTest.csproj|d:\\code\\code web\\n3k2\\testter\\khachsantest\\khachsantest\\pages\\loginpage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8898E143-7BE8-4BB9-BAD2-F75061A472B9}|KhachSanTest\\KhachSanTest.csproj|solutionrelative:khachsantest\\pages\\loginpage.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ExcelDataProvider.cs",
+              "DocumentMoniker": "D:\\Code\\Code Web\\N3K2\\Testter\\KhachSanTest\\KhachSanTest\\Utilities\\ExcelDataProvider.cs",
+              "RelativeDocumentMoniker": "KhachSanTest\\Utilities\\ExcelDataProvider.cs",
+              "ToolTip": "D:\\Code\\Code Web\\N3K2\\Testter\\KhachSanTest\\KhachSanTest\\Utilities\\ExcelDataProvider.cs",
+              "RelativeToolTip": "KhachSanTest\\Utilities\\ExcelDataProvider.cs",
+              "ViewState": "AgIAAHwAAAAAAAAAAAAMwJgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T13:19:42.337Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "RegisterTests.cs",
+              "DocumentMoniker": "D:\\Code\\Code Web\\N3K2\\Testter\\KhachSanTest\\KhachSanTest\\Tests\\RegisterTests.cs",
+              "RelativeDocumentMoniker": "KhachSanTest\\Tests\\RegisterTests.cs",
+              "ToolTip": "D:\\Code\\Code Web\\N3K2\\Testter\\KhachSanTest\\KhachSanTest\\Tests\\RegisterTests.cs",
+              "RelativeToolTip": "KhachSanTest\\Tests\\RegisterTests.cs",
+              "ViewState": "AgIAAOkAAAAAAAAAAAAnwO0AAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-22T16:01:27.941Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "LoginTests.cs",
+              "DocumentMoniker": "D:\\Code\\Code Web\\N3K2\\Testter\\KhachSanTest\\KhachSanTest\\Tests\\LoginTests.cs",
+              "RelativeDocumentMoniker": "KhachSanTest\\Tests\\LoginTests.cs",
+              "ToolTip": "D:\\Code\\Code Web\\N3K2\\Testter\\KhachSanTest\\KhachSanTest\\Tests\\LoginTests.cs",
+              "RelativeToolTip": "KhachSanTest\\Tests\\LoginTests.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGgAAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T13:21:05.015Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "ScreenshotHelper.cs",
+              "DocumentMoniker": "D:\\Code\\Code Web\\N3K2\\Testter\\KhachSanTest\\KhachSanTest\\Utilities\\ScreenshotHelper.cs",
+              "RelativeDocumentMoniker": "KhachSanTest\\Utilities\\ScreenshotHelper.cs",
+              "ToolTip": "D:\\Code\\Code Web\\N3K2\\Testter\\KhachSanTest\\KhachSanTest\\Utilities\\ScreenshotHelper.cs",
+              "RelativeToolTip": "KhachSanTest\\Utilities\\ScreenshotHelper.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB4AAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T13:20:46.985Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "RegisterPage.cs",
+              "DocumentMoniker": "D:\\Code\\Code Web\\N3K2\\Testter\\KhachSanTest\\KhachSanTest\\Pages\\RegisterPage.cs",
+              "RelativeDocumentMoniker": "KhachSanTest\\Pages\\RegisterPage.cs",
+              "ToolTip": "D:\\Code\\Code Web\\N3K2\\Testter\\KhachSanTest\\KhachSanTest\\Pages\\RegisterPage.cs",
+              "RelativeToolTip": "KhachSanTest\\Pages\\RegisterPage.cs",
+              "ViewState": "AgIAACIAAAAAAAAAAAAmwCcAAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-22T16:01:06.109Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "TestReadExcel.cs",
+              "DocumentMoniker": "D:\\Code\\Code Web\\N3K2\\Testter\\KhachSanTest\\KhachSanTest\\Tests\\TestReadExcel.cs",
+              "RelativeDocumentMoniker": "KhachSanTest\\Tests\\TestReadExcel.cs",
+              "ToolTip": "D:\\Code\\Code Web\\N3K2\\Testter\\KhachSanTest\\KhachSanTest\\Tests\\TestReadExcel.cs",
+              "RelativeToolTip": "KhachSanTest\\Tests\\TestReadExcel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAASAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-22T12:56:25.837Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "LoginPage.cs",
+              "DocumentMoniker": "D:\\Code\\Code Web\\N3K2\\Testter\\KhachSanTest\\KhachSanTest\\Pages\\LoginPage.cs",
+              "RelativeDocumentMoniker": "KhachSanTest\\Pages\\LoginPage.cs",
+              "ToolTip": "D:\\Code\\Code Web\\N3K2\\Testter\\KhachSanTest\\KhachSanTest\\Pages\\LoginPage.cs",
+              "RelativeToolTip": "KhachSanTest\\Pages\\LoginPage.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-21T13:20:53.726Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
