@@ -16,9 +16,9 @@ namespace KhachSanTest.Pages
             wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
         }
 
-        private By btnDelete = By.CssSelector(".btn-delete");
-        private By btnConfirm = By.CssSelector(".btn-danger");
-        private By btnCancel = By.CssSelector(".btn-secondary");
+        // FIX: Delete.cshtml dùng "btn-delete" cho nút Xóa, "btn-cancel" cho nút Hủy
+        private By btnConfirm = By.CssSelector("button.btn-delete");
+        private By btnCancel = By.CssSelector("a.btn-cancel");
 
         public void GoToUsers()
         {
@@ -26,16 +26,42 @@ namespace KhachSanTest.Pages
             wait.Until(d => d.Url.Contains("/Users"));
         }
 
+        // FIX: Click link "btn-delete-user" trong hàng để vào trang Delete (thay vì click td text)
         public void SelectUser(string username)
         {
-            var user = wait.Until(d => d.FindElement(By.XPath($"//td[contains(text(),'{username}')]")));
-            user.Click();
+            var rows = wait.Until(ExpectedConditions.PresenceOfAllElementsLocatedBy(
+                By.CssSelector("table tbody tr")));
+
+            foreach (var row in rows)
+            {
+                if (row.Text.ToLower().Contains(username.ToLower()))
+                {
+                    var deleteLink = row.FindElement(By.CssSelector("a.btn-delete-user"));
+
+                    ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView(true);", deleteLink);
+                    wait.Until(ExpectedConditions.ElementToBeClickable(deleteLink));
+
+                    try
+                    {
+                        deleteLink.Click();
+                    }
+                    catch
+                    {
+                        ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].click();", deleteLink);
+                    }
+
+                    // Chờ trang Delete load xong
+                    wait.Until(ExpectedConditions.ElementExists(btnConfirm));
+                    return;
+                }
+            }
+
+            throw new Exception("Không tìm thấy user: " + username);
         }
 
-        public void ClickDelete()
-        {
-            wait.Until(ExpectedConditions.ElementToBeClickable(btnDelete)).Click();
-        }
+        // Giữ lại để tương thích với step "xóa" / "nhấn nút xóa"
+        // SelectUser() đã navigate vào trang Delete nên không cần làm gì thêm
+        public void ClickDelete() { }
 
         public void ConfirmDelete()
         {

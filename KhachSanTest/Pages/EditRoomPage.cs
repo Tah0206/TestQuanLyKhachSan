@@ -14,70 +14,87 @@ namespace KhachSanTest.Pages
         }
 
         // ===== ELEMENT =====
-        private IWebElement ddlCustomer => driver.FindElement(By.Name("CustomerId"));
-        private IWebElement ddlRoom => driver.FindElement(By.Name("RoomId"));
-        private IWebElement txtCheckIn => driver.FindElement(By.Name("CheckInDate"));
-        private IWebElement txtCheckOut => driver.FindElement(By.Name("CheckOutDate"));
-        private IWebElement txtPeople => driver.FindElement(By.Name("NumberOfPeople"));
-        private IWebElement txtNote => driver.FindElement(By.Name("Note"));
-        private IWebElement ddlPayment => driver.FindElement(By.Name("PaymentStatusID"));
-        private IWebElement ddlStatus => driver.FindElement(By.Name("BookingStatusID"));
-        private IWebElement btnSave => driver.FindElement(By.CssSelector("button[type='submit']"));
-        private IWebElement btnCancel => driver.FindElement(By.LinkText("Back to List"));
+        // Dùng By thay vì property trực tiếp để tránh StaleElementReferenceException
+
+        private By ddlCustomer = By.Name("CustomerId");
+        private By ddlRoom = By.Name("RoomId");
+        private By txtCheckIn = By.Name("CheckInDate");
+        private By txtCheckOut = By.Name("CheckOutDate");
+        private By txtPeople = By.Name("NumberOfPeople");
+        private By txtNote = By.Name("Note");
+        private By ddlPayment = By.Name("PaymentStatusID");
+        private By ddlStatus = By.Name("BookingStatusID");
+
+        // Trong Edit.cshtml: <input type="submit" value="Save" class="btn btn-default" />
+        private By btnSave = By.CssSelector("input[type='submit'][value='Save']");
+
+        // Trong Edit.cshtml: @Html.ActionLink("Back to List", "Index") → <a href="...">Back to List</a>
+        private By btnCancel = By.LinkText("Back to List");
+
+        // ===== HELPER =====
+        private IWebElement WaitFor(By by, int seconds = 10)
+        {
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(seconds));
+            return wait.Until(d => d.FindElement(by));
+        }
 
         // ===== ACTION =====
         public void SelectCustomer(string name)
         {
-            new SelectElement(ddlCustomer).SelectByText(name);
+            new SelectElement(WaitFor(ddlCustomer)).SelectByText(name);
         }
 
         public void SelectRoom(string room)
         {
-            new SelectElement(ddlRoom).SelectByText(room);
+            new SelectElement(WaitFor(ddlRoom)).SelectByText(room);
         }
 
         public void EnterCheckIn(string date)
         {
-            txtCheckIn.Clear();
-            txtCheckIn.SendKeys(date);
+            var el = WaitFor(txtCheckIn);
+            el.Clear();
+            el.SendKeys(date);
         }
 
         public void EnterCheckOut(string date)
         {
-            txtCheckOut.Clear();
-            txtCheckOut.SendKeys(date);
+            var el = WaitFor(txtCheckOut);
+            el.Clear();
+            el.SendKeys(date);
         }
 
         public void EnterPeople(string people)
         {
-            txtPeople.Clear();
-            txtPeople.SendKeys(people);
+            var el = WaitFor(txtPeople);
+            el.Clear();
+            el.SendKeys(people);
         }
 
         public void EnterNote(string note)
         {
-            txtNote.Clear();
-            txtNote.SendKeys(note);
+            var el = WaitFor(txtNote);
+            el.Clear();
+            el.SendKeys(note);
         }
 
         public void SelectPayment(string value)
         {
-            new SelectElement(ddlPayment).SelectByText(value);
+            new SelectElement(WaitFor(ddlPayment)).SelectByText(value);
         }
 
         public void SelectStatus(string value)
         {
-            new SelectElement(ddlStatus).SelectByText(value);
+            new SelectElement(WaitFor(ddlStatus)).SelectByText(value);
         }
 
         public void ClickSave()
         {
-            btnSave.Click();
+            WaitFor(btnSave).Click();
         }
 
         public void ClickCancel()
         {
-            btnCancel.Click();
+            WaitFor(btnCancel).Click();
         }
     }
 }

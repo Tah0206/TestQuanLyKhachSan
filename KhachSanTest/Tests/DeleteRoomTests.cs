@@ -45,6 +45,7 @@ namespace KhachSanTest.Tests
         {
             string actual = "";
             string status = "Passed";
+            string image = "";
 
             try
             {
@@ -59,17 +60,30 @@ namespace KhachSanTest.Tests
                 bool isMatch = CompareResult(expected, actual);
                 status = isMatch ? "Passed" : "Failed";
 
+                // Chụp ảnh khi Failed
+                if (status == "Failed")
+                {
+                    image = ScreenshotHelper.TakeScreenshot(driver, tc.TestCaseId);
+                }
+
                 Assert.That(isMatch, Is.True, $"Expected: {expected} | Actual: {actual}");
             }
             catch (Exception ex)
             {
                 status = "Failed";
                 actual = "Lỗi: " + ex.Message;
+
+                // Chụp ảnh khi exception (nếu chưa chụp)
+                if (string.IsNullOrEmpty(image))
+                {
+                    image = ScreenshotHelper.TakeScreenshot(driver, tc.TestCaseId);
+                }
+
                 throw;
             }
             finally
             {
-                ExcelDataProvider.WriteResult(tc.SheetName, tc.TestCaseId, actual, status, "");
+                ExcelDataProvider.WriteResult(tc.SheetName, tc.TestCaseId, actual, status, image);
             }
         }
 
@@ -109,6 +123,7 @@ namespace KhachSanTest.Tests
             }
 
             // DELETE FLOW
+            // "chọn phiếu" → click nút Xóa trên danh sách để vào trang Delete
             if (action.Contains("chọn phiếu"))
             {
                 deleteRoomPage.ClickDelete();
@@ -121,6 +136,7 @@ namespace KhachSanTest.Tests
                 return;
             }
 
+            // "xác nhận xóa" → click nút submit Xóa trên trang Delete.cshtml
             if (action.Contains("xác nhận xóa"))
             {
                 deleteRoomPage.ConfirmDelete();

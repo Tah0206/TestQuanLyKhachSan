@@ -26,18 +26,20 @@ namespace KhachSanTest.Pages
         private By txtEmail = By.Id("Email");
         private By ddlRole = By.Id("RoleId");
 
-        private By btnSave = By.CssSelector("button.btn-submit");
-        private By btnBack = By.CssSelector("a.btn-secondary");
+        // FIX: Edit.cshtml dùng class "btn-delete" cho nút Lưu, "btn-cancel" cho nút Quay lại
+        private By btnSave = By.CssSelector("button.btn-delete");
+        private By btnBack = By.CssSelector("a.btn-cancel");
 
         // ===== NAVIGATION =====
 
         public void GoToUsers()
         {
-            driver.Navigate().GoToUrl("http://localhost:58609/Users/Create");
+            // FIX: URL đúng là /Users (không phải /Users/Create)
+            driver.Navigate().GoToUrl("http://localhost:58609/Users");
             wait.Until(d => d.Url.Contains("/Users"));
         }
 
-        // ===== CLICK EDIT THEO USER (QUAN TRỌNG NHẤT) =====
+        // ===== CLICK EDIT THEO USER =====
 
         public void ClickEditByUsername(string username)
         {
@@ -47,10 +49,10 @@ namespace KhachSanTest.Pages
             {
                 if (row.Text.ToLower().Contains(username.ToLower()))
                 {
-                    var editBtn = row.FindElement(By.XPath(".//a[contains(text(),'Sửa')]"));
+                    // FIX: Index.cshtml dùng class "btn-edit-user" cho link Sửa
+                    var editBtn = row.FindElement(By.CssSelector("a.btn-edit-user"));
 
                     ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView(true);", editBtn);
-
                     wait.Until(ExpectedConditions.ElementToBeClickable(editBtn));
 
                     try
@@ -62,7 +64,6 @@ namespace KhachSanTest.Pages
                         ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].click();", editBtn);
                     }
 
-                    // 🔥 CHỜ FORM LOAD
                     wait.Until(ExpectedConditions.ElementExists(txtUsername));
                     return;
                 }
@@ -71,12 +72,11 @@ namespace KhachSanTest.Pages
             throw new Exception("Không tìm thấy user: " + username);
         }
 
-        // ===== INPUT HELPER (ANTI-FLAKY) =====
+        // ===== INPUT HELPER =====
 
         private void EnterInput(By locator, string value)
         {
             var e = wait.Until(ExpectedConditions.ElementIsVisible(locator));
-
             ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView(true);", e);
 
             try
@@ -87,42 +87,29 @@ namespace KhachSanTest.Pages
             }
             catch
             {
-                // fallback JS (quan trọng)
                 ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].value='';", e);
                 ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].value=arguments[1];", e, value);
             }
         }
 
-        public void EnterUsername(string value)
-        {
-            EnterInput(txtUsername, value);
-        }
+        public void EnterUsername(string value) => EnterInput(txtUsername, value);
 
         public void EnterPassword(string value)
         {
-            // ⚠ password có thể readonly → dùng JS luôn
             var e = wait.Until(ExpectedConditions.ElementExists(txtPassword));
-
             ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].value='';", e);
             ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].value=arguments[1];", e, value);
         }
 
-        public void EnterFullName(string value)
-        {
-            EnterInput(txtFullName, value);
-        }
+        public void EnterFullName(string value) => EnterInput(txtFullName, value);
 
-        public void EnterEmail(string value)
-        {
-            EnterInput(txtEmail, value);
-        }
+        public void EnterEmail(string value) => EnterInput(txtEmail, value);
 
-        // ===== SELECT ROLE (ANTI LỖI DẤU) =====
+        // ===== SELECT ROLE =====
 
         public void SelectRole(string role)
         {
             var select = new SelectElement(wait.Until(ExpectedConditions.ElementExists(ddlRole)));
-
             foreach (var option in select.Options)
             {
                 if (option.Text.Trim().ToLower() == role.Trim().ToLower())
@@ -131,7 +118,6 @@ namespace KhachSanTest.Pages
                     return;
                 }
             }
-
             throw new Exception("Không tìm thấy role: " + role);
         }
 
@@ -146,9 +132,7 @@ namespace KhachSanTest.Pages
         public void ClickSave()
         {
             var btn = wait.Until(ExpectedConditions.ElementExists(btnSave));
-
             ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView(true);", btn);
-
             try
             {
                 btn.Click();

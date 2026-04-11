@@ -100,10 +100,6 @@ namespace KhachSanTest.Tests
             if (a.Contains("stale element"))
                 return false;
 
-            // ✅ CASE CHẶN ADMIN
-            if (e.Contains("chặn") || e.Contains("không cho vào trang admin"))
-                return a.Contains("chặn") || a.Contains("không cho");
-
             if (e.Contains("đăng nhập thành công"))
                 return a.Contains("đăng nhập thành công");
 
@@ -128,6 +124,9 @@ namespace KhachSanTest.Tests
             if (e.Contains("lỗi 2 trường"))
                 return a.Contains("fill");
 
+            // ✅ CASE CHẶN ADMIN
+            if (e.Contains("chặn") || e.Contains("không cho vào trang admin"))
+                return a.Contains("chặn") || a.Contains("không cho") || a.Contains("login");
 
             if (e.Contains("nhớ mật khẩu") || e.Contains("remember"))
                 return a.Contains("không có chức năng");

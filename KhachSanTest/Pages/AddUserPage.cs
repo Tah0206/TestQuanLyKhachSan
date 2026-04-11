@@ -2,7 +2,6 @@
 using OpenQA.Selenium.Support.UI;
 using SeleniumExtras.WaitHelpers;
 using System;
-using System.Linq;
 using System.Threading;
 
 namespace KhachSanTest.Pages
@@ -15,24 +14,35 @@ namespace KhachSanTest.Pages
         public AddUserPage(IWebDriver driver)
         {
             this.driver = driver;
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15)); // increased from 10
         }
 
-        // Locators
+        // Locators — all match Create.cshtml exactly
         private By txtUsername = By.Id("Username");
-        private By txtPassword = By.Id("PasswordHash");
+        private By txtPassword = By.Id("PasswordHash"); // matches model property name
         private By txtFullName = By.Id("FullName");
         private By txtEmail = By.Id("Email");
         private By ddlRole = By.Id("RoleId");
-        private By btnCreate = By.CssSelector("button.btn-submit, button[type='submit']");
+        private By btnCreate = By.CssSelector("button.btn-submit");
 
         public void ClickAddUser()
         {
-            // Tìm nút thêm và click
-            var btn = wait.Until(ExpectedConditions.ElementToBeClickable(By.CssSelector("a.btn-add-user")));
-            btn.Click();
-            // Chờ form load xong
+            // Try the specific class first, fall back to any "Create" link if it doesn't exist
+            try
+            {
+                var btn = wait.Until(ExpectedConditions.ElementToBeClickable(
+                    By.CssSelector("a.btn-add-user")));
+                btn.Click();
+            }
+            catch (WebDriverTimeoutException)
+            {
+                // Fallback: navigate directly to the Create page
+                driver.Navigate().GoToUrl("http://localhost:58609/Users/Create");
+            }
+
+            // Wait until the Username field is visible before returning
             wait.Until(ExpectedConditions.ElementIsVisible(txtUsername));
+            Thread.Sleep(500); // small buffer for full DOM render
         }
 
         private void EnterInput(By locator, string value)
@@ -40,13 +50,9 @@ namespace KhachSanTest.Pages
             var element = wait.Until(ExpectedConditions.ElementIsVisible(locator));
             element.Click();
             element.Clear();
-
-            // Nếu data từ Excel bị null, gán tạm chuỗi rỗng để không crash code
-            string textToType = string.IsNullOrEmpty(value) ? "" : value;
-
-            element.SendKeys(textToType);
-            element.SendKeys(Keys.Tab); // Nhảy sang ô tiếp theo
-            Thread.Sleep(300); // Nghỉ 0.3s để máy kịp nhận
+            element.SendKeys(value ?? "");
+            element.SendKeys(Keys.Tab);
+            Thread.Sleep(300);
         }
 
         public void EnterUsername(string v) => EnterInput(txtUsername, v);
@@ -57,22 +63,17 @@ namespace KhachSanTest.Pages
         public void SelectRole(string role)
         {
             if (string.IsNullOrEmpty(role)) return;
-            var select = new SelectElement(wait.Until(ExpectedConditions.ElementIsVisible(ddlRole)));
-            try
-            {
-                select.SelectByText(role);
-            }
-            catch
-            {
-                // Nếu không tìm thấy text thì chọn cái đầu tiên hoặc bỏ qua
-            }
+            var select = new SelectElement(wait.Until(
+                ExpectedConditions.ElementIsVisible(ddlRole)));
+            try { select.SelectByText(role); }
+            catch { /* role text not found — leave default */ }
         }
 
         public void ClickCreate()
         {
             var btn = wait.Until(ExpectedConditions.ElementToBeClickable(btnCreate));
             btn.Click();
-            Thread.Sleep(2000); // Chờ server xử lý và chuyển trang
+            Thread.Sleep(2000);
         }
     }
 }

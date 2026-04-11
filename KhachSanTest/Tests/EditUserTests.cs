@@ -16,7 +16,7 @@ namespace KhachSanTest.Tests
         EditUserPage editPage;
         WebDriverWait wait;
 
-        string currentUser = ""; // 🔥 lưu user đang thao tác
+        string currentUser = "";
 
         [SetUp]
         public void Setup()
@@ -36,6 +36,7 @@ namespace KhachSanTest.Tests
         {
             string actual = "";
             string status = "Passed";
+            string screenshotPath = "";
 
             try
             {
@@ -50,27 +51,33 @@ namespace KhachSanTest.Tests
                 bool isMatch = CompareResult(expected, actual);
                 status = isMatch ? "Passed" : "Failed";
 
+                if (!isMatch)
+                {
+                    screenshotPath = ScreenshotHelper.TakeScreenshot(driver, tc.TestCaseId);
+                }
+
                 Assert.That(isMatch, Is.True, $"❌ Sai TC: {tc.TestCaseId}");
             }
             catch (Exception ex)
             {
                 status = "Failed";
                 actual = ex.Message;
+                screenshotPath = ScreenshotHelper.TakeScreenshot(driver, tc.TestCaseId);
                 throw;
             }
             finally
             {
-                ExcelDataProvider.WriteResult(tc.SheetName, tc.TestCaseId, actual, status, "");
+                ExcelDataProvider.WriteResult(tc.SheetName, tc.TestCaseId, actual, status, screenshotPath);
             }
         }
 
         // ================= STEP =================
+
         private void ExecuteStep(ExcelDataProvider.TestStep step)
         {
             string action = step.Action.ToLower();
             string data = step.Data ?? "";
 
-            // ===== LOGIN =====
             if (action.Contains("username") && data == "admin")
                 loginPage.EnterUsername(data);
 
@@ -83,26 +90,19 @@ namespace KhachSanTest.Tests
                 wait.Until(d => !d.Url.Contains("Login"));
             }
 
-            // ===== NAV =====
             else if (action.Contains("vào trang"))
                 editPage.GoToUsers();
 
-            // ===== CHỌN USER =====
             else if (action.Contains("chọn tài khoản"))
-            {
-                currentUser = data; // 🔥 lưu lại user
-            }
+                currentUser = data;
 
-            // ===== CLICK EDIT (QUAN TRỌNG NHẤT) =====
             else if (action.Contains("nhấn nút sửa"))
             {
                 if (string.IsNullOrEmpty(currentUser))
                     throw new Exception("Chưa chọn user để sửa");
-
                 editPage.ClickEditByUsername(currentUser);
             }
 
-            // ===== INPUT =====
             else if (action.Contains("nhập username"))
                 editPage.EnterUsername(data);
 
@@ -118,14 +118,12 @@ namespace KhachSanTest.Tests
             else if (action.Contains("chọn role") || action.Contains("đổi role"))
                 editPage.SelectRole(data);
 
-            // ===== CLEAR =====
             else if (action.Contains("xóa họ tên"))
                 editPage.EnterFullName("");
 
             else if (action.Contains("xóa email"))
                 editPage.EnterEmail("");
 
-            // ===== SAVE =====
             else if (action.Contains("lưu"))
                 editPage.ClickSave();
 
@@ -134,6 +132,7 @@ namespace KhachSanTest.Tests
         }
 
         // ================= EXPECTED =================
+
         private string GetExpected(ExcelDataProvider.TestCase tc)
         {
             return tc.Steps
@@ -142,6 +141,7 @@ namespace KhachSanTest.Tests
         }
 
         // ================= ACTUAL =================
+
         private string GetActual()
         {
             try
@@ -163,30 +163,23 @@ namespace KhachSanTest.Tests
         }
 
         // ================= COMPARE =================
+
         private bool CompareResult(string expected, string actual)
         {
             string e = expected.ToLower();
             string a = actual.ToLower();
 
-            if (e.Contains("thành công"))
-                return a.Contains("thành công");
-
-            if (e.Contains("họ tên"))
-                return a.Contains("tên") || a.Contains("name");
-
-            if (e.Contains("email"))
-                return a.Contains("email");
-
-            if (e.Contains("không hợp lệ"))
-                return a.Contains("invalid") || a.Contains("không");
-
-            if (e.Contains("vui lòng"))
-                return a.Contains("vui lòng");
+            if (e.Contains("thành công")) return a.Contains("thành công");
+            if (e.Contains("họ tên")) return a.Contains("tên") || a.Contains("name");
+            if (e.Contains("email")) return a.Contains("email");
+            if (e.Contains("không hợp lệ")) return a.Contains("invalid") || a.Contains("không");
+            if (e.Contains("vui lòng")) return a.Contains("vui lòng");
 
             return a.Contains(e);
         }
 
         // ================= TEARDOWN =================
+
         [TearDown]
         public void Cleanup()
         {

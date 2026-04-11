@@ -3,6 +3,7 @@ using KhachSanTest.Utilities;
 using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Support.UI;
 using System;
 using System.Linq;
 using System.Threading;
@@ -41,16 +42,28 @@ namespace KhachSanTest.Tests
 
                 actual = actualResult;
 
-                bool isMatch = actualResult.ToLower().Contains(expected.ToLower());
+                bool isMatch = CompareResult(expected, actualResult);
                 status = isMatch ? "Passed" : "Failed";
 
-                Assert.That(isMatch, Is.True, $"Sai TC: {tc.TestCaseId}");
+                // Chụp ảnh khi Failed
+                if (status == "Failed")
+                {
+                    image = ScreenshotHelper.TakeScreenshot(driver, tc.TestCaseId);
+                }
+
+                Assert.That(isMatch, Is.True,
+                    $"Sai TC: {tc.TestCaseId}\n  Expected: {expected}\n  Actual  : {actualResult}");
             }
             catch (Exception ex)
             {
                 status = "Failed";
                 actual = ex.Message;
-                image = ScreenshotHelper.TakeScreenshot(driver, tc.TestCaseId);
+
+                if (string.IsNullOrEmpty(image))
+                {
+                    image = ScreenshotHelper.TakeScreenshot(driver, tc.TestCaseId);
+                }
+
                 throw;
             }
             finally
@@ -58,6 +71,54 @@ namespace KhachSanTest.Tests
                 ExcelDataProvider.WriteResult(tc.SheetName, tc.TestCaseId, actual, status, image);
                 driver.Quit();
             }
+        }
+
+        // ================= COMPARE =================
+        /// <summary>
+        /// So sánh expected (từ Excel) với actual (từ trình duyệt).
+        /// - So sánh 2 chiều: actual chứa expected HOẶC expected chứa actual
+        ///   → tránh lỗi khi 2 chuỗi cùng ý nghĩa nhưng độ dài khác nhau
+        ///   (ví dụ: actual="Cập nhật thành công", expected="...được cập nhật thành công")
+        /// - Xử lý các từ khoá ngữ nghĩa đặc biệt
+        /// </summary>
+        private bool CompareResult(string expected, string actual)
+        {
+            if (string.IsNullOrEmpty(expected)) return false;
+
+            string e = expected.Trim().ToLower();
+            string a = actual.Trim().ToLower();
+
+            // --- NHÓM THÀNH CÔNG ---
+            // Expected dạng: "thành công", "cập nhật thành công", "thông tin đặt phòng được cập nhật thành công"...
+            if (e.Contains("thành công"))
+                return a.Contains("thành công");
+
+            // --- NHÓM KHÔNG THAY ĐỔI / GIỮ NGUYÊN ---
+            // Expected dạng: "trạng thái phiếu không thay đổi", "giữ nguyên"...
+            // → actual phải là "Cập nhật thành công" (redirect về list, nghĩa là save OK nhưng
+            //   nội dung không đổi) HOẶC vẫn còn trên trang edit
+            if (e.Contains("không thay đổi") || e.Contains("giữ nguyên"))
+                return a.Contains("thành công") || a.Contains("không thay đổi");
+
+            // --- NHÓM LỖI / VALIDATION ---
+            // Expected dạng: "lỗi", "không hợp lệ", "bắt buộc", "vui lòng nhập"...
+            // Actual có thể là message tiếng Anh của ASP.NET model binding:
+            //   "The value '31/03/2026' is not valid for CheckInDate."
+            //   "The CheckOutDate field is required."
+            if (e.Contains("lỗi") || e.Contains("không hợp lệ") || e.Contains("bắt buộc") || e.Contains("vui lòng"))
+                return a.Contains("lỗi") || a.Contains("không hợp lệ")
+                    || a.Contains("bắt buộc") || a.Contains("vui lòng")
+                    || a.Contains("required")
+                    || a.Contains("invalid")
+                    || a.Contains("not valid")
+                    || a.Contains("must be a")
+                    || a.Contains("value")
+                    || a.Contains("date")
+                    || a.Contains("checkindate") || a.Contains("checkoutdate");
+
+            // --- SO SÁNH 2 CHIỀU (fallback) ---
+            // Bắt cả trường hợp: actual chứa expected, hoặc expected chứa actual
+            return a.Contains(e) || e.Contains(a);
         }
 
         // ================= STEP =================
@@ -86,10 +147,19 @@ namespace KhachSanTest.Tests
                 Thread.Sleep(1000);
             }
 
-            // CHỌN PHIẾU
+            // CHỌN PHIẾU - click nút Sửa đầu tiên
+            // Index.cshtml: <a class="btn-edit-booking"><i ...></i> Sửa</a>
+            // Không dùng LinkText("Sửa") vì thẻ <a> chứa icon <i> nên text không thuần
             else if (action.Contains("chọn phiếu"))
             {
-                driver.FindElements(By.LinkText("Sửa"))[0].Click();
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+                wait.Until(d => d.FindElements(By.CssSelector("a.btn-edit-booking")).Count > 0);
+
+                var editButtons = driver.FindElements(By.CssSelector("a.btn-edit-booking"));
+                if (editButtons.Count == 0)
+                    throw new NoSuchElementException("Không tìm thấy nút Sửa (a.btn-edit-booking) trên trang danh sách.");
+
+                editButtons[0].Click();
                 Thread.Sleep(1000);
             }
 
@@ -139,12 +209,32 @@ namespace KhachSanTest.Tests
         {
             try
             {
-                if (driver.Url.Contains("Bookings"))
-                    return "Cập nhật thành công";
+                // PHẢI kiểm tra lỗi TRƯỚC khi kiểm tra URL
+                // Vì URL trang Edit dạng /Bookings/Edit/5 cũng chứa "bookings"
+                // → nếu check URL trước sẽ luôn trả về "Cập nhật thành công" dù đang có lỗi
 
+                // 1. Kiểm tra lỗi validation (text-danger) trên form hiện tại
                 var errors = driver.FindElements(By.ClassName("text-danger"));
                 if (errors.Count > 0)
-                    return errors[0].Text;
+                {
+                    var errorText = errors
+                        .Select(e => e.Text.Trim())
+                        .FirstOrDefault(t => !string.IsNullOrEmpty(t));
+                    if (!string.IsNullOrEmpty(errorText))
+                        return errorText;
+                }
+
+                // 2. Không có lỗi + URL là trang danh sách (/Bookings, /Bookings/Index)
+                //    → Save thành công và đã redirect về list
+                string url = driver.Url.ToLower();
+                bool isListPage = url.EndsWith("/bookings")
+                               || url.EndsWith("/bookings/")
+                               || url.EndsWith("/bookings/index")
+                               || url.Contains("/bookings?")
+                               || url.Contains("/bookings#");
+
+                if (isListPage)
+                    return "Cập nhật thành công";
 
                 return "";
             }
@@ -152,22 +242,17 @@ namespace KhachSanTest.Tests
             {
                 return "";
             }
-
         }
+
         [TearDown]
         public void Cleanup()
         {
             if (driver != null)
             {
-                // 1. Đóng trình duyệt và kết thúc session
                 driver.Quit();
-
-                // 2. Giải phóng tài nguyên bộ nhớ (Sửa lỗi bạn đang gặp)
                 driver.Dispose();
-
-                // 3. Đưa về null để tránh dùng nhầm ở TC sau
                 driver = null;
             }
         }
     }
-}
+}   

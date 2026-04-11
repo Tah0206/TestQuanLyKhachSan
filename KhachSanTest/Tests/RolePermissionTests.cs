@@ -44,13 +44,30 @@ namespace KhachSanTest.Tests
                 bool isMatch = CompareResult(expected, actualResult);
                 status = isMatch ? "Passed" : "Failed";
 
-                Assert.That(isMatch, Is.True, $"Sai kết quả tại {tc.TestCaseId}");
+                // FIX: Chụp màn hình ngay khi kết quả KHÔNG khớp (trước khi Assert ném exception)
+                if (!isMatch)
+                {
+                    imagePath = ScreenshotHelper.TakeScreenshot(driver, tc.TestCaseId);
+                }
+
+                Assert.That(isMatch, Is.True,
+                    $"[{tc.TestCaseId}] Expected: '{expected}' | Actual: '{actualResult}'");
             }
-            catch (Exception ex)
+            catch (Exception ex) when (!(ex is AssertionException))
             {
+                // Exception không phải do Assert (vd: NoSuchElement, Timeout...)
                 status = "Failed";
                 actual = ex.Message;
-                imagePath = ScreenshotHelper.TakeScreenshot(driver, tc.TestCaseId);
+
+                // Chỉ chụp nếu chưa chụp ở trên
+                if (string.IsNullOrEmpty(imagePath))
+                    imagePath = ScreenshotHelper.TakeScreenshot(driver, tc.TestCaseId);
+
+                throw;
+            }
+            catch (AssertionException)
+            {
+                // Assert thất bại: ảnh đã được chụp ở trên, chỉ cần re-throw
                 throw;
             }
             finally
@@ -75,11 +92,7 @@ namespace KhachSanTest.Tests
             string data = step.Data ?? "";
 
             // ===== LOGIN =====
-            if (action.Contains("nhập username") && data == "admin")
-            {
-                loginPage.EnterUsername(data);
-            }
-            else if (action.Contains("nhập username") && data == "user")
+            if (action.Contains("nhập username"))
             {
                 loginPage.EnterUsername(data);
             }
@@ -107,9 +120,11 @@ namespace KhachSanTest.Tests
             }
 
             // ===== EDIT =====
+            // FIX: SelectUser chỉ ghi nhớ username; ClickEdit() mới thực sự click nút Sửa
             else if (action.Contains("nhấn sửa"))
             {
                 rolePage.ClickEdit();
+                Thread.Sleep(1000);
             }
 
             // ===== ROLE =====
@@ -151,16 +166,41 @@ namespace KhachSanTest.Tests
             {
                 string url = driver.Url.ToLower();
 
-                if (url.Contains("/users"))
+                // Sau khi lưu thành công -> redirect về /Users
+                if (url.Contains("/users") && !url.Contains("/edit"))
                     return "Cập nhật quyền thành công";
 
-                var errors = driver.FindElements(By.ClassName("text-danger"));
-                if (errors.Count > 0)
-                    return errors[0].Text;
+                // Đang ở trang Edit → đọc các option trong dropdown #RoleId
+                // Dùng cho test case kiểm tra "dropdown hiển thị đủ N quyền"
+                if (url.Contains("/edit"))
+                {
+                    var ddlElems = driver.FindElements(By.Id("RoleId"));
+                    if (ddlElems.Count > 0)
+                    {
+                        var select = new OpenQA.Selenium.Support.UI.SelectElement(ddlElems[0]);
+                        var options = select.Options
+                            .Where(o => !string.IsNullOrWhiteSpace(o.Text.Trim()))
+                            .Select(o => o.Text.Trim())
+                            .ToList();
 
-                var msg = driver.FindElements(By.ClassName("alert"));
-                if (msg.Count > 0)
-                    return msg[0].Text;
+                        if (options.Count > 0)
+                            return "Hiển thị " + string.Join(", ", options);
+                    }
+                }
+
+                // Lỗi validation
+                var errors = driver.FindElements(By.ClassName("text-danger"));
+                foreach (var err in errors)
+                {
+                    string txt = err.Text?.Trim();
+                    if (!string.IsNullOrEmpty(txt))
+                        return txt;
+                }
+
+                // Alert thông báo
+                var alerts = driver.FindElements(By.ClassName("alert"));
+                if (alerts.Count > 0)
+                    return alerts[0].Text?.Trim();
 
                 return "";
             }
@@ -173,8 +213,10 @@ namespace KhachSanTest.Tests
         // ================= COMPARE =================
         private bool CompareResult(string expected, string actual)
         {
-            string e = expected.ToLower();
-            string a = actual.ToLower();
+            if (string.IsNullOrEmpty(expected)) return true;
+
+            string e = expected.ToLower().Trim();
+            string a = actual.ToLower().Trim();
 
             if (e.Contains("thành công"))
                 return a.Contains("thành công");
@@ -190,6 +232,23 @@ namespace KhachSanTest.Tests
 
             if (e.Contains("không có thay đổi"))
                 return a.Contains("không") || a.Contains("no change");
+
+            // So sánh danh sách quyền trong dropdown
+            // Expected: "Hiển thị Admin, Nhân viên, Khách hàng, Quản lý"
+            // Actual:   "Hiển thị Admin, Nhân viên, Khách hàng, Quản lý"
+            if (e.Contains("hiển thị"))
+            {
+                string eList = e.Replace("hiển thị", "").Trim();
+                string aList = a.Replace("hiển thị", "").Trim();
+
+                var expectedItems = eList.Split(',')
+                    .Select(x => x.Trim())
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .ToList();
+
+                // Tất cả quyền trong expected phải xuất hiện trong actual
+                return expectedItems.All(item => aList.Contains(item));
+            }
 
             return a.Contains(e);
         }
